@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DataManagement.Client/DataManagement.Client.csproj" />
+  <Project Path="DataManagement/DataManagement.csproj" />
+</Solution>
