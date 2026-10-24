@@ -1,3 +1,130 @@
-﻿@page "/AddRecord"
+﻿@using DataManagement.db
+
+@page "/AddRecord"
+@inject DbManager db;
 <h3>Добаввить объект недивжимости</h3>
 
+<EditForm Model="Model" OnSubmit="Submit" FormName="AddHousing">
+    <DataAnnotationsValidator />
+	<ValidationSummary/>
+	<div class="mb-2">
+		<label>
+			Тип объекта:
+			<InputSelect @bind-Value="Model.type">
+				<option value="">— выберите —</option>
+				@foreach (var t in Types) {
+					<option value="@t">@t</option>
+				}
+			</InputSelect>
+		</label>
+		<ValidationMessage For="() => Model.type" />
+	</div>
+    <div class="mb-2">
+        <label>
+            Площадь, м²:
+            <InputNumber @bind-Value="Model.square" />
+        </label>
+        <ValidationMessage For="() => Model.square" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Цена, ₽:
+            <InputNumber @bind-Value="Model.price" />
+        </label>
+        <ValidationMessage For="() => Model.price" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Статус:
+            <InputSelect @bind-Value="Model.status">
+                <option value="">— выберите —</option>
+                @foreach (var s in Statuses) {
+                    <option value="@s">@s</option>
+                }
+            </InputSelect>
+        </label>
+        <ValidationMessage For="() => Model.status" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Количество комнат:
+            <InputNumber @bind-Value="Model.numberOfRooms" />
+        </label>
+        <ValidationMessage For="() => Model.numberOfRooms" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Количество этажей:
+            <InputNumber @bind-Value="Model.countFloor" />
+        </label>
+        <ValidationMessage For="() => Model.countFloor" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Лифт:
+            <InputSelect @bind-Value="Model.elevator">
+                <option value="">— выберите —</option>
+                <option value="true">Есть</option>
+                <option value="false">Нет</option>
+            </InputSelect>
+        </label>
+        <ValidationMessage For="() => Model.elevator" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Ремонт:
+            <InputSelect @bind-Value="Model.repair">
+                <option value="">— выберите —</option>
+                @foreach (var r in Repairs) {
+                    <option value="@r">@r</option>
+                }
+            </InputSelect>
+        </label>
+        <ValidationMessage For="() => Model.repair" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Описание:
+            <InputTextArea @bind-Value="Model.description" />
+        </label>
+        <ValidationMessage For="() => Model.description" />
+    </div>
+
+    <div class="mb-2">
+        <label>
+            Адрес:
+            <InputText @bind-Value="Model.adress" />
+        </label>
+        <ValidationMessage For="() => Model.adress" />
+    </div>
+
+    <button type="submit">Сохранить</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private RowRecord? Model { get; set; }
+    private string? resultMessage;
+    private static readonly string[] Types =
+        { "коммерческое помещение", "жилое помещение", "дом", "участок" };
+    private static readonly string[] Statuses =
+        { "активное", "не активное", "в заморозке" };
+    private static readonly string[] Repairs =
+        { "без ремонта", "косметический", "евроремонт", "дизайнерский" };
+
+    protected override void OnInitialized()
+    {
+        Model ??= new();
+    }
+    private async Task Submit() {
+        var (sucsses, err) = await db.AddRecord(Model);
+        resultMessage = sucsses ? "Объект добавлен" : $"Ошибка: {err}";
+    }
+}

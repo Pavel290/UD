@@ -1,5 +1,6 @@
 using DataManagement.Client.Pages;
 using DataManagement.Components;
+using DataManagement.db;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
-
+builder.Services.AddScoped<DbManager>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
