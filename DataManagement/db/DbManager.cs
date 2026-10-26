@@ -8,11 +8,11 @@ namespace DataManagement.db {
     public class DbManager {
 
         string connectionString = "Server=localhost; Database=DataBase; Uid=root; Pwd=;";
+        public async Task<Tuple<bool, string>> AddHousinng(RowRecord record) {
         string query = "INSERT INTO housing (Type, Square, Price, Status, number_of_rooms, count_floor, elevator, repair, description, adress) VALUES (@Type, @Square, @Price, @Status, @number_of_rooms, @count_floor, @elevator, @repair, @description, @adress)";
-        public async Task<Tuple<bool, string>> AddRecord(RowRecord record) {
             using (MySqlConnection connection = new MySqlConnection(connectionString)) {
                 try {
-                    connection.OpenAsync();
+                    await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection)) {
                         command.Parameters.AddWithValue("@Type", record.type);
                         command.Parameters.AddWithValue("@Square", record.square);
@@ -31,6 +31,31 @@ namespace DataManagement.db {
                 } catch (MySqlException ex) {
                     return Tuple.Create(false, ex.Message);
                 } catch (Exception ex2) {
+                    return Tuple.Create(false, ex2.Message);
+                }
+            }
+        }
+        public async Task<Tuple<bool, string>> AddLead(LeadRecord record) {
+            string query = "INSERT INTO leads (Name, Number_phone, Description, Status, city) VALUES (@Name, @Number_phone, @Description, @Status, @city)";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString)) {
+                try {
+                    await connection.OpenAsync();
+                    using (MySqlCommand command = new MySqlCommand(query, connection)) {
+                        command.Parameters.AddWithValue("@Name", record.name);
+                        command.Parameters.AddWithValue("@Number_phone", record.number_phone);
+                        command.Parameters.AddWithValue("@Description", record.description);
+                        command.Parameters.AddWithValue("@Status", record.status);
+                        command.Parameters.AddWithValue("@city", record.city);
+
+                        int row = await command.ExecuteNonQueryAsync();
+                        return Tuple.Create(true, $"Добавлено записей {row}");
+                    }
+                }
+                catch (MySqlException ex) {
+                    return Tuple.Create(false, ex.Message);
+                }
+                catch (Exception ex2) {
                     return Tuple.Create(false, ex2.Message);
                 }
             }

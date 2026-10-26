@@ -1,0 +1,132 @@
+/* Карточка формы */
+.form-card {
+    max-width: 640px;
+    margin: 1.5rem auto;
+    padding: 2rem;
+    background: #ffffff;
+    border: 1px solid #e3e6ea;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+h3 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #1f2d3d;
+}
+
+/* Каждая строка формы: подпись сверху, поле под ней */
+::deep .mb-2 {
+    margin-bottom: 1.1rem;
+}
+
+::deep label {
+    display: block;
+    width: 100%;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+/* Поля ввода */
+::deep input,
+::deep select,
+::deep textarea {
+    display: block;
+    width: 100%;
+    margin-top: 0.35rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 1rem;
+    color: #1f2d3d;
+    background: #f9fafb;
+    border: 1px solid #cbd2d9;
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    box-sizing: border-box;
+}
+
+::deep textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+    ::deep input:focus,
+    ::deep select:focus,
+    ::deep textarea:focus {
+        outline: none;
+        background: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+/* Состояния валидации (классы добавляет сам Blazor) */
+::deep .modified.valid {
+    border-color: #22a06b;
+    box-shadow: 0 0 0 2px rgba(34, 160, 107, 0.15);
+}
+
+::deep .invalid {
+    border-color: #e5484d;
+    box-shadow: 0 0 0 2px rgba(229, 72, 77, 0.15);
+}
+
+/* Сообщения об ошибках под полями */
+::deep .validation-message {
+    margin-top: 0.3rem;
+    font-size: 0.82rem;
+    color: #e5484d;
+}
+
+/* Общий список ошибок (ValidationSummary) */
+::deep .validation-errors {
+    margin: 0 0 1.25rem;
+    padding: 0.75rem 1rem 0.75rem 2rem;
+    font-size: 0.9rem;
+    color: #b42318;
+    background: #fef3f2;
+    border: 1px solid #fecdca;
+    border-radius: 8px;
+}
+
+/* Кнопка */
+::deep button[type="submit"] {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: #3b82f6;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+}
+
+    ::deep button[type="submit"]:hover {
+        background: #2563eb;
+    }
+
+    ::deep button[type="submit"]:active {
+        transform: translateY(1px);
+    }
+
+/* Сообщение о результате */
+.result {
+    margin-top: 1.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+    .result.success {
+        color: #067647;
+        background: #ecfdf3;
+        border: 1px solid #abefc6;
+    }
+
+    .result.error {
+        color: #b42318;
+        background: #fef3f2;
+        border: 1px solid #fecdca;
+    }

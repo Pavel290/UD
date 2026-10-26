@@ -1,0 +1,78 @@
+﻿@using DataManagement.db
+@page "/AddLead"
+@inject DbManager db
+
+<div class="form-card">
+    <h3>Новый клиент</h3>
+    <EditForm Model="Model" OnValidSubmit="Submit" FormName="AddLead">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-2">
+            <label>
+                Имя клиента:
+                <InputText @bind-Value="Model.name" />
+            </label>
+            <ValidationMessage For="() => Model.name" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Номер телефона:
+                <InputText @bind-Value="Model.number_phone" type="tel" />
+            </label>
+            <ValidationMessage For="() => Model.number_phone" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Описание:
+                <InputTextArea @bind-Value="Model.description" />
+            </label>
+            <ValidationMessage For="() => Model.description" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Статус:
+                <InputSelect @bind-Value="Model.status">
+                    <option value="">— выберите —</option>
+                    @foreach (var r in status) {
+                        <option value="@r">@r</option>
+                    }
+                </InputSelect>
+            </label>
+            <ValidationMessage For="() => Model.status" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Населённый пункт:
+                <InputText @bind-Value="Model.city" />
+            </label>
+            <ValidationMessage For="() => Model.city" />
+        </div>
+        <button type="submit">Сохранить</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(resultMessage)) {
+        <div class="result @(isSuccess ? "success" : "error")">@resultMessage</div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private LeadRecord? Model { get; set; }
+
+    private string[] status = ["в работе", "заморожен", "не активен"];
+
+    private string? resultMessage;
+    private bool isSuccess;
+
+    protected override void OnInitialized() {
+        Model ??= new();
+    }
+
+    private async Task Submit() {
+        var (sccss, resultMessage) = await db.AddLead(Model);
+        isSuccess = sccss;
+        resultMessage = isSuccess ? "Клиент добавлени" : $"{resultMessage}";
+
+    }
+}
