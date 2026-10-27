@@ -89,6 +89,37 @@ namespace DataManagement.db {
                 }
             }
         }
+        public async Task<List<RowRecord>> GetHousing() {
+            const string selectQuery = @"
+        SELECT Type, Square, Price, Status, number_of_rooms,
+               count_floor, elevator, repair, description, adress
+        FROM housing
+        ORDER BY Price DESC";
 
+            var list = new List<RowRecord>();
+
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            await using var command = new MySqlCommand(selectQuery, connection);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync()) {
+                list.Add(new RowRecord {
+                    type = reader.IsDBNull(0) ? null : reader.GetString(0),
+                    square = reader.IsDBNull(1) ? null : reader.GetFloat(1),
+                    price = reader.IsDBNull(2) ? null : reader.GetDecimal(2),
+                    status = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    numberOfRooms = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                    countFloor = reader.IsDBNull(5) ? null : reader.GetInt32(5),
+                    elevator = reader.IsDBNull(6) ? null : reader.GetBoolean(6),
+                    repair = reader.IsDBNull(7) ? null : reader.GetString(7),
+                    description = reader.IsDBNull(8) ? null : reader.GetString(8),
+                    adress = reader.IsDBNull(9) ? null : reader.GetString(9)
+                });
+            }
+
+            return list;
+        }
     }
 }

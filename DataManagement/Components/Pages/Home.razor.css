@@ -1,0 +1,135 @@
+h1 {
+    margin-bottom: 1.25rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #17212b;
+}
+
+.muted {
+    color: #6b7683;
+    font-size: 0.9rem;
+}
+
+/* сетка карточек */
+::deep .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.15rem;
+    margin-top: 1rem;
+}
+
+::deep .card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.15rem 1.25rem;
+    background: #fff;
+    border: 1px solid #e5e8ec;
+    border-radius: 13px;
+    box-shadow: 0 3px 14px rgba(20, 30, 45, 0.06);
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+
+    ::deep .card:hover {
+        box-shadow: 0 8px 24px rgba(20, 30, 45, 0.1);
+        transform: translateY(-2px);
+    }
+
+::deep .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+}
+
+::deep .badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #2f6fed;
+    background: #eef3fe;
+    border-radius: 6px;
+}
+
+::deep .status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+::deep .status-active {
+    color: #067647;
+}
+
+::deep .status-frozen {
+    color: #b25b00;
+}
+
+::deep .status-off {
+    color: #98a2b3;
+}
+
+::deep .price {
+    margin-bottom: 0.9rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #17212b;
+    letter-spacing: -0.02em;
+}
+
+::deep .props {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid #eef1f4;
+    font-size: 0.83rem;
+}
+
+    ::deep .props > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    ::deep .props dt {
+        color: #8a94a3;
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    ::deep .props dd {
+        margin: 0;
+        color: #2b3644;
+        font-weight: 500;
+    }
+
+::deep .desc {
+    margin: 0.9rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #55606d;
+}
+
+::deep .alert {
+    padding: 0.9rem 1rem;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+
+    ::deep .alert.error {
+        color: #a8282d;
+        background: #fdf2f2;
+        border-color: #f6cccc;
+    }
+
+    ::deep .alert.empty {
+        color: #55606d;
+        background: #f7f9fb;
+        border-color: #e2e7ec;
+    }

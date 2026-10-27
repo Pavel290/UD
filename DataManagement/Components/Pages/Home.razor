@@ -1,5 +1,84 @@
 ﻿@page "/"
+@using DataManagement.db
+@inject DbManager Db
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Объекты недвижимости</PageTitle>
 
-<h1>Информационная система агенства недвижимости!</h1>
+<h1>Объекты недвижимости</h1>
+
+@if (isLoading)
+{
+    <p class="muted">Загрузка…</p>
+}
+else if (error != null)
+{
+    <div class="alert error">Не удалось загрузить данные: @error</div>
+}
+else if (items.Count == 0)
+{
+    <div class="alert empty">
+        Пока нет ни одного объекта.
+        <NavLink href="AddRecord">Добавить первый</NavLink>
+    </div>
+}
+else
+{
+    <p class="muted">Всего объектов: @items.Count</p>
+
+    <div class="cards">
+        @foreach (var item in items)
+        {
+            <article class="card">
+                <header class="card-head">
+                    <span class="badge">@item.type</span>
+                    <span class="status @StatusClass(item.status)">@item.status</span>
+                </header>
+
+                <div class="price">@item.price?.ToString("N0") ₽</div>
+
+                <dl class="props">
+                    <div><dt>Площадь</dt><dd>@item.square?.ToString("0.#") м²</dd></div>
+                    <div><dt>Комнат</dt><dd>@item.numberOfRooms</dd></div>
+                    <div><dt>Этажей</dt><dd>@item.countFloor</dd></div>
+                    <div><dt>Лифт</dt><dd>@(item.elevator == true ? "есть" : "нет")</dd></div>
+                    <div><dt>Ремонт</dt><dd>@item.repair</dd></div>
+                    <div><dt>Адрес</dt><dd>@item.adress</dd></div>
+                </dl>
+
+                @if (!string.IsNullOrWhiteSpace(item.description))
+                {
+                    <p class="desc">@item.description</p>
+                }
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private List<RowRecord> items = [];
+    private bool isLoading = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            items = await Db.GetHousing();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string StatusClass(string? status) => status switch
+    {
+        "активное" => "status-active",
+        "в заморозке" => "status-frozen",
+        _ => "status-off"
+    };
+}

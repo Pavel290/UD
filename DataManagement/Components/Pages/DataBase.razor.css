@@ -1,25 +1,36 @@
-.action-buttons {
-    display: flex;
-    flex-direction: row;
-    gap: 80px;
-    margin-top: 40px;
+h1 {
+    margin-bottom: 1.25rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #17212b;
 }
 
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 320px));
+    gap: 24px 80px;
+    justify-content: start;
+    margin-top: 40px;
+}
 ::deep .action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 320px;
-    height: 180px;
+    width: 100%;
+    min-height: 180px;
+    padding: 1rem;
+    text-align: center;
     background-color: #f3e6d0 !important;
     color: #2c3a45 !important;
     font-family: "Montserrat", "Segoe UI", sans-serif;
     font-weight: 800;
     font-size: 1.4rem;
+    line-height: 1.25;
     text-decoration: none !important;
     border: none;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
 }
 
     ::deep .action-btn:hover,
@@ -29,3 +40,20 @@
         color: #2c3a45 !important;
         text-decoration: none !important;
     }
+@media (max-width: 900px) {
+    .action-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 560px) {
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    ::deep .action-btn {
+        min-height: 90px;
+        font-size: 1.15rem;
+    }
+}
