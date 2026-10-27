@@ -9,7 +9,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataManagement.Client\DataManagement.Client.csproj" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.13" />
     <PackageReference Include="MySql.Data" Version="26.10.0" />
   </ItemGroup>
 

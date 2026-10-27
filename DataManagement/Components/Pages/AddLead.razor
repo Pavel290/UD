@@ -70,9 +70,9 @@
     }
 
     private async Task Submit() {
-        var (sccss, resultMessage) = await db.AddLead(Model);
+        var (sccss, rM) = await db.AddLead(Model);
         isSuccess = sccss;
-        resultMessage = isSuccess ? "Клиент добавлени" : $"{resultMessage}";
+        resultMessage = isSuccess ? "Клиент добавлени" : $"{rM}";
 
     }
 }

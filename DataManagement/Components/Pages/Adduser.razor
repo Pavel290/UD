@@ -1,0 +1,97 @@
+﻿@using DataManagement.db
+@page "/AddUser"
+@inject DbManager db
+
+<div class="form-card">
+    <h3>Новый сотрудник</h3>
+    <EditForm Model="Usr" OnValidSubmit="Submit" FormName="AddUser">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <label>
+                Логин сотрудника:
+                <InputText @bind-Value="Usr.login" />
+            </label>
+            <ValidationMessage For="() => Usr.login" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Пароль сотрудника:
+                <InputText @bind-Value="Usr.password" />
+            </label>
+            <ValidationMessage For="() => Usr.password" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Роль:
+                <InputSelect @bind-Value="Usr.roly">
+                    <option value="">— выберите —</option>
+                    @foreach (var r in roly) {
+                        <option value="@r">@r</option>
+                    }
+                </InputSelect>
+            </label>
+            <ValidationMessage For="() => Usr.roly" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Статус:
+                <InputSelect @bind-Value="Usr.status">
+                    <option value="">— выберите —</option>
+                    @foreach (var r in status) {
+                        <option value="@r">@r</option>
+                    }
+                </InputSelect>
+            </label>
+            <ValidationMessage For="() => Usr.status" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Имя сотрудника:
+                <InputText @bind-Value="Usr.name" />
+            </label>
+            <ValidationMessage For="() => Usr.name" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Номер телефона:
+                <InputText @bind-Value="Usr.number_phone" type="tel" />
+            </label>
+            <ValidationMessage For="() => Usr.number_phone" />
+        </div>
+        <div class="mb-2">
+            <label>
+                Населённый пункт:
+                <InputText @bind-Value="Usr.city" />
+            </label>
+            <ValidationMessage For="() => Usr.city" />
+        </div>
+        <button type="submit">Сохранить</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(resultMessage)) {
+        <div class="result @(isSuccess ? "success" : "error")">@resultMessage</div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private User? Usr { get; set; }
+
+    private string[] status = ["работает", "не работает"];
+    private string[] roly = ["Аналитик", "Агент по  недвижиимости", "Директор", "Маркетолог"];
+
+    private string? resultMessage;
+    private bool isSuccess;
+
+    protected override void OnInitialized() {
+        Usr ??= new();
+    }
+
+    private async Task Submit() {
+        var (sccss, rM) = await db.AddUser(Usr);
+        isSuccess = sccss;
+        resultMessage = isSuccess ? "Сотрудник добавлени" : $"{rM}";
+
+    }
+}

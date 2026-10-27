@@ -9,7 +9,7 @@ namespace DataManagement.db {
 
         string connectionString = "Server=localhost; Database=DataBase; Uid=root; Pwd=;";
         public async Task<Tuple<bool, string>> AddHousinng(RowRecord record) {
-        string query = "INSERT INTO housing (Type, Square, Price, Status, number_of_rooms, count_floor, elevator, repair, description, adress) VALUES (@Type, @Square, @Price, @Status, @number_of_rooms, @count_floor, @elevator, @repair, @description, @adress)";
+            string query = "INSERT INTO housing (Type, Square, Price, Status, number_of_rooms, count_floor, elevator, repair, description, adress) VALUES (@Type, @Square, @Price, @Status, @number_of_rooms, @count_floor, @elevator, @repair, @description, @adress)";
             using (MySqlConnection connection = new MySqlConnection(connectionString)) {
                 try {
                     await connection.OpenAsync();
@@ -28,9 +28,11 @@ namespace DataManagement.db {
                         int row = await command.ExecuteNonQueryAsync();
                         return Tuple.Create(true, $"Добавлено записей {row}");
                     }
-                } catch (MySqlException ex) {
+                }
+                catch (MySqlException ex) {
                     return Tuple.Create(false, ex.Message);
-                } catch (Exception ex2) {
+                }
+                catch (Exception ex2) {
                     return Tuple.Create(false, ex2.Message);
                 }
             }
@@ -60,5 +62,33 @@ namespace DataManagement.db {
                 }
             }
         }
+        public async Task<Tuple<bool, string>> AddUser(User record) {
+            string query = "INSERT INTO users (Login, Hash, Role, Status, name, number_phone, city) VALUES (@Login, @Hash, @Role, @Status, @name, @number_phone, @city)";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString)) {
+                try {
+                    await connection.OpenAsync();
+                    using (MySqlCommand command = new MySqlCommand(query, connection)) {
+                        command.Parameters.AddWithValue("@Login", record.login);
+                        command.Parameters.AddWithValue("@Hash",record.hesh );
+                        command.Parameters.AddWithValue("@Role", record.roly);
+                        command.Parameters.AddWithValue("@Status", record.status);
+                        command.Parameters.AddWithValue("@name", record.name);
+                        command.Parameters.AddWithValue("@number_phone", record.number_phone);
+                        command.Parameters.AddWithValue("@city", record.city);
+
+                        int row = await command.ExecuteNonQueryAsync();
+                        return Tuple.Create(true, $"Добавлено записей {row}");
+                    }
+                }
+                catch (MySqlException ex) {
+                    return Tuple.Create(false, ex.Message);
+                }
+                catch (Exception ex2) {
+                    return Tuple.Create(false, ex2.Message);
+                }
+            }
+        }
+
     }
 }
