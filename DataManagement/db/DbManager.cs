@@ -94,7 +94,7 @@ namespace DataManagement.db {
         SELECT Type, Square, Price, Status, number_of_rooms,
                count_floor, elevator, repair, description, adress
         FROM housing
-        ORDER BY Price DESC";
+        ORDER BY datetime DESC";
 
             var list = new List<RowRecord>();
 
@@ -121,7 +121,28 @@ namespace DataManagement.db {
 
             return list;
         }
+        public async Task<List<LeadRecord>> GetLeads() {
+            const string selectQuery = @"SELECT Name, Number_phone, Description, Status, city FROM leads ORDER BY datetime DESC";
+            var list = new List<LeadRecord>();
 
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            await using var command = new MySqlCommand(selectQuery, connection);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync()) {
+                list.Add(new LeadRecord {
+                    name = reader.IsDBNull(0) ? null : reader.GetString(0),
+                    number_phone = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    description = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    status = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    city = reader.IsDBNull(4) ? null : reader.GetString(4),
+                })
+            }
+
+            return list;
+        }
 
     }
 }

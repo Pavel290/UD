@@ -1,162 +1,34 @@
-/* Карточка формы */
-.form-card {
-    max-width: 640px;
-    margin: 1.5rem auto;
-    padding: 2rem;
-    background: #ffffff;
-    border: 1px solid #e3e6ea;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
 h3 {
-    margin-bottom: 1.5rem;
+    margin: 0 0 1rem;
+    font-size: 1.35rem;
     font-weight: 600;
     color: #1f2d3d;
 }
 
-/* Каждая строка формы: подпись сверху, поле под ней */
-::deep .mb-2 {
-    margin-bottom: 1.1rem;
-}
-
-::deep label {
-    display: block;
-    width: 100%;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #4a5568;
-}
-
-/* Поля ввода */
-::deep input,
-::deep select,
-::deep textarea {
-    display: block;
-    width: 100%;
-    margin-top: 0.35rem;
-    padding: 0.6rem 0.75rem;
-    font-size: 1rem;
-    color: #1f2d3d;
-    background: #f9fafb;
-    border: 1px solid #cbd2d9;
-    border-radius: 8px;
-    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-    box-sizing: border-box;
-}
-
-::deep textarea {
-    min-height: 110px;
-    resize: vertical;
-}
-
-    ::deep input:focus,
-    ::deep select:focus,
-    ::deep textarea:focus {
-        outline: none;
-        background: #ffffff;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-
-/* Состояния валидации (классы добавляет сам Blazor) */
-::deep .modified.valid {
-    border-color: #22a06b;
-    box-shadow: 0 0 0 2px rgba(34, 160, 107, 0.15);
-}
-
-::deep .invalid {
-    border-color: #e5484d;
-    box-shadow: 0 0 0 2px rgba(229, 72, 77, 0.15);
-}
-
-/* Сообщения об ошибках под полями */
-::deep .validation-message {
-    margin-top: 0.3rem;
-    font-size: 0.82rem;
-    color: #e5484d;
-}
-
-/* Общий список ошибок (ValidationSummary) */
-::deep .validation-errors {
-    margin: 0 0 1.25rem;
-    padding: 0.75rem 1rem 0.75rem 2rem;
-    font-size: 0.9rem;
-    color: #b42318;
-    background: #fef3f2;
-    border: 1px solid #fecdca;
-    border-radius: 8px;
-}
-
-/* Кнопка */
-::deep button[type="submit"] {
-    width: 100%;
-    margin-top: 0.5rem;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
-    background: #3b82f6;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.05s;
-}
-
-    ::deep button[type="submit"]:hover {
-        background: #2563eb;
-    }
-
-    ::deep button[type="submit"]:active {
-        transform: translateY(1px);
-    }
-
-/* Сообщение о результате */
-.result {
-    margin-top: 1.25rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-    .result.success {
-        color: #067647;
-        background: #ecfdf3;
-        border: 1px solid #abefc6;
-    }
-
-    .result.error {
-        color: #b42318;
-        background: #fef3f2;
-        border: 1px solid #fecdca;
-    }
+/* ---------- Кнопка добавления ---------- */
 .action-buttons {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 320px));
-    gap: 24px 80px;
-    justify-content: start;
-    margin-top: 40px;
+    grid-template-columns: minmax(0, 280px);
+    margin-bottom: 1.75rem;
 }
 
 ::deep .action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    min-height: 180px;
-    padding: 1rem;
-    text-align: center;
-    background-color: #f3e6d0 !important;
-    color: #2c3a45 !important;
+    min-height: 56px;
+    padding: 0.75rem 1.25rem;
     font-family: "Montserrat", "Segoe UI", sans-serif;
-    font-weight: 800;
-    font-size: 1.4rem;
-    line-height: 1.25;
-    text-decoration: none !important;
-    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    color: #2c3a45 !important;
+    background-color: #f3e6d0 !important;
     border-radius: 8px;
+    text-decoration: none !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
+    transition: background-color 0.15s;
 }
 
     ::deep .action-btn:hover,
@@ -167,20 +39,135 @@ h3 {
         text-decoration: none !important;
     }
 
-@media (max-width: 900px) {
-    .action-buttons {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-    }
+/* ---------- Служебный текст ---------- */
+.muted {
+    color: #6b7683;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
 }
 
-@media (max-width: 560px) {
-    .action-buttons {
-        grid-template-columns: 1fr;
+/* ---------- Сетка карточек ---------- */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.15rem;
+    margin-top: 1rem;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.15rem 1.25rem;
+    background: #fff;
+    border: 1px solid #e5e8ec;
+    border-radius: 13px;
+    box-shadow: 0 3px 14px rgba(20, 30, 45, 0.06);
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(20, 30, 45, 0.1);
+        transform: translateY(-2px);
     }
 
-    ::deep .action-btn {
-        min-height: 90px;
-        font-size: 1.15rem;
-    }
+.card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
 }
+
+.badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #2f6fed;
+    background: #eef3fe;
+    border-radius: 6px;
+}
+
+.status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-active {
+    color: #067647;
+}
+
+.status-frozen {
+    color: #b25b00;
+}
+
+.status-off {
+    color: #98a2b3;
+}
+
+.price {
+    margin-bottom: 0.9rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #17212b;
+    letter-spacing: -0.02em;
+}
+
+/* ---------- Характеристики ---------- */
+.props {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid #eef1f4;
+    font-size: 0.83rem;
+}
+
+    .props > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    .props dt {
+        color: #8a94a3;
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .props dd {
+        margin: 0;
+        color: #2b3644;
+        font-weight: 500;
+    }
+
+.desc {
+    margin: 0.9rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #55606d;
+}
+
+/* ---------- Сообщения ---------- */
+.alert {
+    padding: 0.9rem 1rem;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+
+    .alert.error {
+        color: #a8282d;
+        background: #fdf2f2;
+        border-color: #f6cccc;
+    }
+
+    .alert.empty {
+        color: #55606d;
+        background: #f7f9fb;
+        border-color: #e2e7ec;
+    }
