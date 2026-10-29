@@ -71,13 +71,15 @@ else if (items.Count == 0)
         Пока нет ни одного объекта.
         <NavLink href="AddRecord">Добавить первый</NavLink>
     </div>
+} else if (FilteredItems.Count == 0) {
+    <div class="alert empty">Под заданные условия ничего не найдено.</div>
 }
 else
 {
-    <p class="muted">Всего объектов: @items.Count</p>
+    <p class="muted">Найдено: @FilteredItems.Count из @items.Count</p>
 
     <div class="cards">
-        @foreach (var item in items)
+        @foreach (var item in FilteredItems)
         {
             <article class="card">
                 <header class="card-head">
