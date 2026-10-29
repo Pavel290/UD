@@ -1,10 +1,61 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 @using DataManagement.db
 @inject DbManager Db
 
 <PageTitle>Объекты недвижимости</PageTitle>
 
 <h1>Объекты недвижимости</h1>
+
+<div class="filters">
+    <div class="filter-field">
+        <label>Тип объекта</label>
+        <select @bind="filterType">
+            <option value="">Все</option>
+            @foreach (var t in Types)
+            {
+                <option value="@t">@t</option>
+            }
+        </select>
+    </div>
+
+    <div class="filter-field">
+        <label>Статус</label>
+        <select @bind="filterStatus">
+            <option value="">Все</option>
+            @foreach (var s in Statuses)
+            {
+                <option value="@s">@s</option>
+            }
+        </select>
+    </div>
+
+    <div class="filter-field">
+        <label>Цена от</label>
+        <input type="number" @bind="minPrice" @bind:event="oninput" placeholder="0" />
+    </div>
+
+    <div class="filter-field">
+        <label>Цена до</label>
+        <input type="number" @bind="maxPrice" @bind:event="oninput" placeholder="Без ограничений" />
+    </div>
+
+    <div class="filter-field">
+        <label>Комнат от</label>
+        <input type="number" @bind="minRooms" @bind:event="oninput" placeholder="0" />
+    </div>
+
+    <div class="filter-field">
+        <label>Лифт</label>
+        <select @bind="filterElevator">
+            <option value="">Неважно</option>
+            <option value="true">Есть</option>
+            <option value="false">Нет</option>
+        </select>
+    </div>
+
+    <button class="reset-btn" @onclick="ResetFilters">Сбросить</button>
+</div>
 
 @if (isLoading)
 {
@@ -59,6 +110,16 @@ else
     private bool isLoading = true;
     private string? error;
 
+    private string filterType = "";
+    private string filterStatus = "";
+    private string filterElevator = "";
+    private decimal? minPrice;
+    private decimal? maxPrice;
+    private int? minRooms;
+
+    private static readonly string[] Types = { "коммерческое помещение", "жилое помещение", "дом", "участок" };
+    private static readonly string[] Statuses = { "активное", "не активное", "в заморозке" };
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -73,6 +134,25 @@ else
         {
             isLoading = false;
         }
+    }
+
+    private List<RowRecord> FilteredItems => items.Where(i =>
+        (string.IsNullOrEmpty(filterType) || i.type == filterType) &&
+        (string.IsNullOrEmpty(filterStatus) || i.status == filterStatus) &&
+        (!minPrice.HasValue || i.price >= minPrice) &&
+        (!maxPrice.HasValue || i.price <= maxPrice) &&
+        (!minRooms.HasValue || i.numberOfRooms >= minRooms) &&
+        (string.IsNullOrEmpty(filterElevator) || i.elevator == bool.Parse(filterElevator))
+    ).ToList();
+
+    private void ResetFilters()
+    {
+        filterType = "";
+        filterStatus = "";
+        filterElevator = "";
+        minPrice = null;
+        maxPrice = null;
+        minRooms = null;
     }
 
     private static string StatusClass(string? status) => status switch
