@@ -1,0 +1,190 @@
+h3 {
+    margin: 0 0 1rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1f2d3d;
+}
+
+/* ---------- Кнопка добавления ---------- */
+.action-buttons {
+    display: grid;
+    grid-template-columns: minmax(0, 280px);
+    margin-bottom: 1.75rem;
+}
+
+::deep .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0.75rem 1.25rem;
+    font-family: "Montserrat", "Segoe UI", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    color: #2c3a45 !important;
+    background-color: #f3e6d0 !important;
+    border-radius: 8px;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    transition: background-color 0.15s;
+}
+
+    ::deep .action-btn:hover,
+    ::deep .action-btn:focus,
+    ::deep .action-btn.active {
+        background-color: #ead7b8 !important;
+        color: #2c3a45 !important;
+        text-decoration: none !important;
+    }
+
+/* ---------- Служебный текст ---------- */
+.muted {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: #6b7683;
+}
+
+/* ---------- Сетка карточек ---------- */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 1.15rem;
+    margin-top: 1rem;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.15rem 1.25rem;
+    background: #fff;
+    border: 1px solid #e5e8ec;
+    border-radius: 13px;
+    box-shadow: 0 3px 14px rgba(20, 30, 45, 0.06);
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(20, 30, 45, 0.1);
+        transform: translateY(-2px);
+    }
+
+/* ---------- Шапка: аватар, имя, статус ---------- */
+.card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.9rem;
+}
+
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #2f6fed;
+    background: #eef3fe;
+    border-radius: 50%;
+    user-select: none;
+}
+
+.who {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0; /* иначе длинное имя не даст сжаться */
+    flex: 1;
+}
+
+.name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #17212b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.city {
+    font-size: 0.78rem;
+    color: #8a94a3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status {
+    flex: 0 0 auto;
+    font-size: 0.74rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-active {
+    color: #067647;
+}
+
+.status-frozen {
+    color: #b25b00;
+}
+
+.status-no-active {
+    color: #98a2b3;
+}
+
+.status-off {
+    color: #98a2b3;
+}
+
+/* ---------- Телефон ---------- */
+.phone {
+    display: inline-block;
+    margin-bottom: 0.9rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #17212b;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+}
+
+    .phone:hover {
+        color: #2f6fed;
+        text-decoration: underline;
+    }
+
+/* ---------- Описание ---------- */
+.desc {
+    margin: 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid #eef1f4;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #55606d;
+}
+
+/* ---------- Сообщения ---------- */
+.alert {
+    padding: 0.9rem 1rem;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+
+    .alert.error {
+        color: #a8282d;
+        background: #fdf2f2;
+        border-color: #f6cccc;
+    }
+
+    .alert.empty {
+        color: #55606d;
+        background: #f7f9fb;
+        border-color: #e2e7ec;
+    }

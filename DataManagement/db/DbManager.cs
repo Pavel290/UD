@@ -138,11 +138,31 @@ namespace DataManagement.db {
                     description = reader.IsDBNull(2) ? null : reader.GetString(2),
                     status = reader.IsDBNull(3) ? null : reader.GetString(3),
                     city = reader.IsDBNull(4) ? null : reader.GetString(4),
-                })
+                });
             }
 
             return list;
         }
+        public async Task<List<User>> GetUsers() {
+            const string selectQuery = @"SELECT Role, Status, name, number_phone, city FROM users ORDER BY datetime DESC";
+            var list = new List<User>();
 
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            await using var command = new MySqlCommand(selectQuery, connection);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync()) {
+                list.Add(new User {
+                    roly = reader.IsDBNull(0) ? null : reader.GetString(0),
+                    status = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    name = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    number_phone = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    city = reader.IsDBNull(4) ? null: reader.GetString(4),
+                });
+            }
+            return list;
+        }
     }
 }

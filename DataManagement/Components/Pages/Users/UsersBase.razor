@@ -1,0 +1,95 @@
+﻿@page "/UsersBase"
+@rendermode InteractiveServer
+@using DataManagement.db
+@inject DbManager Db
+
+<h3>Сотрудники</h3>
+
+<div class="action-buttons">
+    <NavLink class="action-btn" href="/AddUser">Добавить сотрудника</NavLink>
+</div>
+
+@if (isLoading) {
+    <p class="muted">Загрузка…</p>
+} else if (error != null) {
+    <div class="alert error">Не удалось загрузить данные: @error</div>
+} else if (items.Count == 0) {
+    <div class="alert empty">
+        Пока нет ни одного сотрудника.
+        <NavLink href="/AddUser">Добавить первого</NavLink>
+    </div>
+} else {
+    <p class="muted">Найдено: @items.Count</p>
+
+    <div class="cards">
+        @foreach (var item in items) {
+            <article class="card">
+                <header class="card-head">
+                    <span class="avatar">@Initials(item.name)</span>
+                    <div class="who">
+                        <span class="name">@item.name</span>
+                        @if (!string.IsNullOrWhiteSpace(item.city)) {
+                            <span class="city">@item.city</span>
+                        }
+                    </div>
+                    <span class="status @StatusClass(item.status)">@item.status</span>
+                </header>
+
+                @if (!string.IsNullOrWhiteSpace(item.roly)) {
+                    <span class="role @RoleClass(item.roly)">@item.roly</span>
+                }
+
+                <a class="phone" href="@TelHref(item.number_phone)">@item.number_phone</a>
+            </article>
+        }
+    </div>
+}
+
+@code {
+    List<User> items = [];
+    private bool isLoading = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() {
+        try {
+            items = await Db.GetUsers();
+        }
+        catch (Exception ex) {
+            error = ex.Message;
+        }
+        finally {
+            isLoading = false;
+        }
+    }
+
+    private static string Initials(string? name) {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1)
+            return parts[0][..1].ToUpper();
+
+        return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    }
+
+    private static string TelHref(string? phone) {
+        if (string.IsNullOrWhiteSpace(phone)) return "#";
+
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        if (digits.Length == 11 && digits[0] == '8')
+            digits = "7" + digits[1..];
+
+        return $"tel:+{digits}";
+    }
+    private static string StatusClass(string? status) => status switch {
+        "работает" => "status-active",
+        "не работает" => "status-no-active",
+        _ => "status-off"
+    };
+    private static string RoleClass(string? role) => role switch {
+        "Директор" => "role-director",
+        "Аналитик" => "role-analyst",
+        "Маркетолог" => "role-marketing",
+        _ => "role-agent"
+    };
+}
