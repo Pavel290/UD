@@ -40,6 +40,9 @@
 				@if (!string.IsNullOrWhiteSpace(item.description)) {
 					<p class="desc">@item.description</p>
 				}
+				<footer class="card-actions">
+					<NavLink class="btn-edit" href="@($"/EditLead/{item.id}")">Редактировать</NavLink>
+				</footer>
 			</article>
 		}
 	</div>

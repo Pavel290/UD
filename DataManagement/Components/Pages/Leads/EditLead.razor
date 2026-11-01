@@ -1,6 +1,132 @@
-﻿@page "/EditLead"
-<h3>Редактирование клиентов</h3>
+﻿@page "/EditLead/{Id:int}"
+@rendermode InteractiveServer
+@using DataManagement.db
+@inject DbManager Db
+@inject NavigationManager Nav
+
+<div class="form-card">
+    <h3>Редактирование клиента</h3>
+
+    @if (isLoading) {
+        <p class="muted">Загрузка…</p>
+    } else if (error != null) {
+        <div class="alert error">@error</div>
+        <NavLink class="btn-back" href="/LeadsBase">← К списку клиентов</NavLink>
+    } else {
+        <EditForm Model="Model" OnValidSubmit="Submit" FormName="EditLead">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-2">
+                <label>
+                    Имя клиента:
+                    <InputText @bind-Value="Model.name" />
+                </label>
+                <ValidationMessage For="() => Model.name" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Номер телефона:
+                    <InputText @bind-Value="Model.number_phone" type="tel" />
+                </label>
+                <ValidationMessage For="() => Model.number_phone" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Описание:
+                    <InputTextArea @bind-Value="Model.description" />
+                </label>
+                <ValidationMessage For="() => Model.description" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Статус:
+                    <InputSelect @bind-Value="Model.status">
+                        <option value="">— выберите —</option>
+                        @foreach (var s in Statuses) {
+                            <option value="@s">@s</option>
+                        }
+                    </InputSelect>
+                </label>
+                <ValidationMessage For="() => Model.status" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Населённый пункт:
+                    <InputText @bind-Value="Model.city" />
+                </label>
+                <ValidationMessage For="() => Model.city" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Сохранить изменения</button>
+                <NavLink class="btn-cancel" href="/LeadsBase">Отмена</NavLink>
+            </div>
+
+            @if (!string.IsNullOrEmpty(resultMessage)) {
+                <div class="result @(isSuccess ? "success" : "error")">@resultMessage</div>
+            }
+        </EditForm>
+    }
+</div>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
 
+    private LeadRecord Model = new();
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isSuccess;
+    private string? error;
+    private string? resultMessage;
+
+    private readonly string[] Statuses = ["в работе", "заморожен", "не активен"];
+
+    // OnParametersSetAsync, а не OnInitializedAsync:
+    // при переходе /EditLead/1 -> /EditLead/2 компонент не пересоздаётся
+    protected override async Task OnParametersSetAsync() {
+        isLoading = true;
+        error = null;
+        resultMessage = null;
+
+        try {
+            var found = await Db.GetLead(Id);
+            if (found is null)
+                error = $"Клиент с id={Id} не найден";
+            else
+                Model = found;
+        }
+        catch (Exception ex) {
+            error = ex.Message;
+        }
+        finally {
+            isLoading = false;
+        }
+    }
+
+    private async Task Submit() {
+        if (isSaving) return;
+        isSaving = true;
+
+        try {
+            var (ok, message) = await Db.UpdateLead(Model);
+            isSuccess = ok;
+            resultMessage = ok ? "Изменения сохранены" : message;
+
+            if (ok)
+                Nav.NavigateTo("/LeadsBase");
+        }
+        catch (Exception ex) {
+            isSuccess = false;
+            resultMessage = ex.Message;
+        }
+        finally {
+            isSaving = false;
+        }
+    }
 }

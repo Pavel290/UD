@@ -2,6 +2,7 @@
 
 namespace DataManagement.db {
     public class LeadRecord {
+        public int id { get; set; }
         [Required(ErrorMessage = "Необходимо ввести имя клиента")]
         [StringLength(100, ErrorMessage = "Имя слишком длинное")]
         [RegularExpression(@"^[\p{L}\s\-]+$", ErrorMessage = "Имя не должно содержать цифры")]
