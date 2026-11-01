@@ -171,3 +171,36 @@ h3 {
         background: #f7f9fb;
         border-color: #e2e7ec;
     }
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+}
+
+::deep .btn-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 38px;
+    padding: 0.45rem 0.9rem;
+    font-family: inherit;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #2f6fed;
+    background: #eef3fe;
+    border: 1px solid #d5e2fd;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+    ::deep .btn-edit:hover,
+    ::deep .btn-edit:focus {
+        color: #1a4fc4;
+        background: #e2ebfd;
+        border-color: #b9cffb;
+        text-decoration: none !important;
+    }
