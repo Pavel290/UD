@@ -91,7 +91,7 @@ namespace DataManagement.db {
         }
         public async Task<List<RowRecord>> GetHousing() {
             const string selectQuery = @"
-        SELECT Type, Square, Price, Status, number_of_rooms,
+        SELECT id, Type, Square, Price, Status, number_of_rooms,
                count_floor, elevator, repair, description, adress
         FROM housing
         ORDER BY datetime DESC";
@@ -106,16 +106,17 @@ namespace DataManagement.db {
 
             while (await reader.ReadAsync()) {
                 list.Add(new RowRecord {
-                    type = reader.IsDBNull(0) ? null : reader.GetString(0),
-                    square = reader.IsDBNull(1) ? null : reader.GetFloat(1),
-                    price = reader.IsDBNull(2) ? null : reader.GetDecimal(2),
-                    status = reader.IsDBNull(3) ? null : reader.GetString(3),
-                    numberOfRooms = reader.IsDBNull(4) ? null : reader.GetInt32(4),
-                    countFloor = reader.IsDBNull(5) ? null : reader.GetInt32(5),
-                    elevator = reader.IsDBNull(6) ? null : reader.GetBoolean(6),
-                    repair = reader.IsDBNull(7) ? null : reader.GetString(7),
-                    description = reader.IsDBNull(8) ? null : reader.GetString(8),
-                    adress = reader.IsDBNull(9) ? null : reader.GetString(9)
+                    id = reader.GetInt32(0),
+                    type = reader.IsDBNull(0) ? null : reader.GetString(1),
+                    square = reader.IsDBNull(1) ? null : reader.GetFloat(2),
+                    price = reader.IsDBNull(2) ? null : reader.GetDecimal(3),
+                    status = reader.IsDBNull(3) ? null : reader.GetString(4),
+                    numberOfRooms = reader.IsDBNull(4) ? null : reader.GetInt32(5),
+                    countFloor = reader.IsDBNull(5) ? null : reader.GetInt32(6),
+                    elevator = reader.IsDBNull(6) ? null : reader.GetBoolean(7),
+                    repair = reader.IsDBNull(7) ? null : reader.GetString(8),
+                    description = reader.IsDBNull(8) ? null : reader.GetString(9),
+                    adress = reader.IsDBNull(9) ? null : reader.GetString(10)
                 });
             }
 
@@ -163,6 +164,30 @@ namespace DataManagement.db {
                 });
             }
             return list;
+        }
+        public async Task<RowRecord> GetHous(int id) {
+            string query = $"SELECT * FROM housing WHERE id = {id}";
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            await using var command = new MySqlCommand(query, connection);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync()) {
+                return new RowRecord {
+                    type = reader.IsDBNull(0) ? null : reader.GetString(0),
+                    square = reader.IsDBNull(1) ? null : reader.GetFloat(1),
+                    price = reader.IsDBNull(2) ? null : reader.GetDecimal(2),
+                    status = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    numberOfRooms = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                    countFloor = reader.IsDBNull(5) ? null : reader.GetInt32(5),
+                    elevator = reader.IsDBNull(6) ? null : reader.GetBoolean(6),
+                    repair = reader.IsDBNull(7) ? null : reader.GetString(7),
+                    description = reader.IsDBNull(8) ? null : reader.GetString(8),
+                    adress = reader.IsDBNull(9) ? null : reader.GetString(9)
+                };
+            }
+            return new RowRecord { };
         }
     }
 }

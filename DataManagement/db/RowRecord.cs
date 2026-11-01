@@ -38,5 +38,7 @@ namespace DataManagement.db {
         [Required(ErrorMessage = "Обязательно необходимо заполнить адресс объекта.")]
         [StringLength(100, ErrorMessage = "Адресс слишком длинный")]
         public string? adress { get; set; }
+
+        public int id {  get; set; }
     }
 }
