@@ -34,7 +34,7 @@ namespace DataManagement.db {
 
         [StringLength(100, ErrorMessage = "Слишком длинное описание.")]
         public string? city { get; set; }
-
+        public int id { get; set; }
         public string hesh { get {
                 var passwordHasher = new PasswordHasher();
                 return passwordHasher.HashPassword(this.password);

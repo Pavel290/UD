@@ -1,6 +1,202 @@
-﻿@page "/EditUser"
-<h3>Редактирование сотрудников</h3>
+﻿@using System.ComponentModel.DataAnnotations;
+
+@page "/EditUser/{Id:int}"
+@rendermode InteractiveServer
+@using DataManagement.db
+@inject DbManager Db
+@inject NavigationManager Nav
+
+<div class="form-card">
+    <h3>Редактирование сотрудника</h3>
+
+    @if (isLoading) {
+        <p class="muted">Загрузка…</p>
+    } else if (error != null) {
+        <div class="alert error">@error</div>
+        <NavLink class="btn-back" href="/UsersBase">← К списку сотрудников</NavLink>
+    } else {
+        <div class="mb-2">
+            <label>
+                Логин сотрудника:
+                <span class="readonly-value">@login</span>
+            </label>
+            <p class="hint">Логин и пароль здесь не меняются — это учётные данные.</p>
+        </div>
+
+        <EditForm Model="Model" OnValidSubmit="Submit" FormName="EditUser">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-2">
+                <label>
+                    Роль:
+                    <InputSelect @bind-Value="Model.roly">
+                        <option value="">— выберите —</option>
+                        @foreach (var r in Roles) {
+                            <option value="@r">@r</option>
+                        }
+                    </InputSelect>
+                </label>
+                <ValidationMessage For="() => Model.roly" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Статус:
+                    <InputSelect @bind-Value="Model.status">
+                        <option value="">— выберите —</option>
+                        @foreach (var s in Statuses) {
+                            <option value="@s">@s</option>
+                        }
+                    </InputSelect>
+                </label>
+                <ValidationMessage For="() => Model.status" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Имя сотрудника:
+                    <InputText @bind-Value="Model.name" />
+                </label>
+                <ValidationMessage For="() => Model.name" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Номер телефона:
+                    <InputText @bind-Value="Model.number_phone" type="tel" />
+                </label>
+                <ValidationMessage For="() => Model.number_phone" />
+            </div>
+
+            <div class="mb-2">
+                <label>
+                    Населённый пункт:
+                    <InputText @bind-Value="Model.city" />
+                </label>
+                <ValidationMessage For="() => Model.city" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Сохранить изменения</button>
+                <NavLink class="btn-cancel" href="/UsersBase">Отмена</NavLink>
+            </div>
+
+            @if (!string.IsNullOrEmpty(resultMessage)) {
+                <div class="result @(isSuccess ? "success" : "error")">@resultMessage</div>
+            }
+        </EditForm>
+    }
+</div>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
 
+    private UserEditModel Model = new();
+    private string? login;
+
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isSuccess;
+    private string? error;
+    private string? resultMessage;
+
+    // значения точно совпадают с AllowedValues в User.cs.
+    // внимание: в роли агента ДВА пробела между «по» и «недвижимости» —
+    // так записано в User.cs и Adduser.razor, и так же лежит в базе
+    private readonly string[] Roles =
+        ["Аналитик", "Агент по  недвижимости", "Директор", "Маркетолог"];
+
+    private readonly string[] Statuses =
+        ["работает", "не работает"];
+
+    // OnParametersSetAsync, а не OnInitializedAsync:
+    // при переходе /EditUser/1 -> /EditUser/2 компонент не пересоздаётся
+    protected override async Task OnParametersSetAsync() {
+        isLoading = true;
+        error = null;
+        resultMessage = null;
+
+        try {
+            var found = await Db.GetUser(Id);
+            if (found is null) {
+                error = $"Сотрудник с id={Id} не найден";
+            } else {
+                login = found.login;
+                Model = new UserEditModel {
+                    roly = found.roly,
+                    status = found.status,
+                    name = found.name,
+                    number_phone = found.number_phone,
+                    city = found.city
+                };
+            }
+        }
+        catch (Exception ex) {
+            error = ex.Message;
+        }
+        finally {
+            isLoading = false;
+        }
+    }
+
+    private async Task Submit() {
+        if (isSaving) return;
+        isSaving = true;
+
+        try {
+            var record = new User {
+                id = Id,
+                roly = Model.roly,
+                status = Model.status,
+                name = Model.name,
+                number_phone = Model.number_phone,
+                city = Model.city
+            };
+
+            var (ok, message) = await Db.UpdateUser(record);
+            isSuccess = ok;
+            resultMessage = ok ? "Изменения сохранены" : message;
+
+            if (ok)
+                Nav.NavigateTo("/UsersBase");
+        }
+        catch (Exception ex) {
+            isSuccess = false;
+            resultMessage = ex.Message;
+        }
+        finally {
+            isSaving = false;
+        }
+    }
+
+    // Отдельная модель для формы. Класс User для этого не годится:
+    // у него поля login и password помечены [Required], и при
+    // сохранении карточки форма потребовала бы заново ввести пароль.
+    private class UserEditModel {
+        [Required(ErrorMessage = "Необходимо указать роль")]
+        [AllowedValues("Аналитик", "Агент по  недвижимости", "Директор", "Маркетолог",
+            ErrorMessage = "Недопустимая роль!")]
+        public string? roly { get; set; }
+
+        [Required(ErrorMessage = "Обязательно надо установить статус пользователя.")]
+        [AllowedValues("работает", "не работает",
+            ErrorMessage = "Допустимые значения — работает / не работает")]
+        public string? status { get; set; }
+
+        [Required(ErrorMessage = "Необходимо ввести имя сотрудника")]
+        [StringLength(100, ErrorMessage = "Имя слишком длинное")]
+        [RegularExpression(@"^[\p{L}\s\-]+$", ErrorMessage = "Имя не должно содержать цифры")]
+        public string? name { get; set; }
+
+        [Required(ErrorMessage = "Необходимо ввести номер телефона")]
+        [StringLength(11, ErrorMessage = "Некорректно введён номер телефона")]
+        [RegularExpression(@"^(\+7|7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$",
+            ErrorMessage = "Номер телефона введён некорректно")]
+        public string? number_phone { get; set; }
+
+        [StringLength(100, ErrorMessage = "Слишком длинное название населённого пункта.")]
+        public string? city { get; set; }
+    }
 }

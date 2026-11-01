@@ -23,7 +23,7 @@
 
     <div class="cards">
         @foreach (var item in items) {
-            <article class="card">
+            <article class="card" @key="item.id">
                 <header class="card-head">
                     <span class="avatar">@Initials(item.name)</span>
                     <div class="who">
@@ -40,6 +40,10 @@
                 }
 
                 <a class="phone" href="@TelHref(item.number_phone)">@item.number_phone</a>
+
+                <footer class="card-actions">
+                    <NavLink class="btn-edit" href="@($"/EditUser/{item.id}")">Редактировать</NavLink>
+                </footer>
             </article>
         }
     </div>

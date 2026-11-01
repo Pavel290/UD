@@ -203,7 +203,7 @@ namespace DataManagement.db {
             }
         }
         public async Task<List<User>> GetUsers() {
-            const string selectQuery = @"SELECT Role, Status, name, number_phone, city FROM users ORDER BY datetime DESC";
+            const string selectQuery = @"SELECT id, Role, Status, name, number_phone, city FROM users ORDER BY datetime DESC";
             var list = new List<User>();
 
             await using var connection = new MySqlConnection(connectionString);
@@ -214,15 +214,74 @@ namespace DataManagement.db {
 
             while (await reader.ReadAsync()) {
                 list.Add(new User {
-                    roly = reader.IsDBNull(0) ? null : reader.GetString(0),
-                    status = reader.IsDBNull(1) ? null : reader.GetString(1),
-                    name = reader.IsDBNull(2) ? null : reader.GetString(2),
-                    number_phone = reader.IsDBNull(3) ? null : reader.GetString(3),
-                    city = reader.IsDBNull(4) ? null: reader.GetString(4),
+                    id = reader.GetInt32(0),
+                    roly = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    status = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    name = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    number_phone = reader.IsDBNull(4) ? null : reader.GetString(4),
+                    city = reader.IsDBNull(5) ? null : reader.GetString(5),
                 });
             }
             return list;
         }
+        public async Task<User?> GetUser(int id) {
+            const string query = @"
+        SELECT id, Login, Role, Status, name, number_phone, city
+        FROM users
+        WHERE id = @id
+        LIMIT 1";
+
+            await using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            await using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (!await reader.ReadAsync()) return null;
+
+            return new User {
+                id = reader.GetInt32(0),
+                login = reader.IsDBNull(1) ? null : reader.GetString(1),
+                roly = reader.IsDBNull(2) ? null : reader.GetString(2),
+                status = reader.IsDBNull(3) ? null : reader.GetString(3),
+                name = reader.IsDBNull(4) ? null : reader.GetString(4),
+                number_phone = reader.IsDBNull(5) ? null : reader.GetString(5),
+                city = reader.IsDBNull(6) ? null : reader.GetString(6)
+            };
+        }
+        public async Task<Tuple<bool, string>> UpdateUser(User record) {
+            const string query = @"
+        UPDATE users SET
+            Role = @Role, Status = @Status, name = @name,
+            number_phone = @number_phone, city = @city
+        WHERE id = @id";
+
+            using var connection = new MySqlConnection(connectionString);
+            try {
+                await connection.OpenAsync();
+                using var command = new MySqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@Role", record.roly);
+                command.Parameters.AddWithValue("@Status", record.status);
+                command.Parameters.AddWithValue("@name", record.name);
+                command.Parameters.AddWithValue("@number_phone", record.number_phone);
+                command.Parameters.AddWithValue("@city", record.city);
+                command.Parameters.AddWithValue("@id", record.id);
+
+                int rows = await command.ExecuteNonQueryAsync();
+                return rows > 0
+                    ? Tuple.Create(true, $"Обновлено записей {rows}")
+                    : Tuple.Create(false, "Запись не найдена");
+            }
+            catch (MySqlException ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+            catch (Exception ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+        }
+
         public async Task<RowRecord?> GetHous(int id) {
             const string query = @"SELECT id, Type, Square, Price, Status, number_of_rooms, count_floor, elevator, repair, description, adress FROM housing WHERE id = @id LIMIT 1";
 
