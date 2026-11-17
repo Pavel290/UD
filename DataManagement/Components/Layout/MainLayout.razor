@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using DataManagement.db
+@implements IDisposable
+@inject UserSession Session
+@inject NavigationManager Nav
 
 <div class="page">
     <div class="sidebar">
@@ -6,8 +10,21 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <p class="site-title">Агенство недвижимости</p>
+        <div class="top-row px-4" style="display: flex; justify-content: space-between; align-items: center;">
+            <p class="site-title" style="margin: 0;">Агентство недвижимости</p>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                @if (Session.IsSessionActive) {
+                    <span>
+                        👤 <strong>@Session.Name</strong>
+                        <small style="color: #666;">(@(Session.IsGuest ? "Сессия без пароля" : Session.Role))</small>
+                    </span>
+                    <button class="btn btn-sm btn-outline-danger" @onclick="Logout">Выйти</button>
+                } else {
+                    <span style="color: #888;">Не авторизован</span>
+                    <a class="btn btn-sm btn-primary" href="/login">Войти</a>
+                }
+            </div>
         </div>
 
         <article class="content px-4">
@@ -21,3 +38,28 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    protected override void OnInitialized() {
+        Session.OnChange += StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            await Session.LoadSessionAsync();
+            if (!Session.IsSessionActive && !Nav.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase)) {
+                Nav.NavigateTo("/login");
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task Logout() {
+        await Session.LogoutAsync();
+        Nav.NavigateTo("/login");
+    }
+
+    public void Dispose() {
+        Session.OnChange -= StateHasChanged;
+    }
+}

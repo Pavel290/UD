@@ -403,29 +403,38 @@ namespace DataManagement.db {
             }
         }
         public async Task<User?> Login(string login, string password) {
-            const string query = "SELECT id, Login, Hash, Role, name FROM users WHERE Login = @login LIMIT 1";
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+                return null;
 
-            using var connection = new MySqlConnection(connectionString);
+            const string query = "SELECT id, Login, Hash, Role, Status, name, number_phone, city FROM users WHERE Login = @login LIMIT 1";
+
+            await using var connection = new MySqlConnection(connectionString);
             await connection.OpenAsync();
 
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@login", login);
+            await using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@login", login.Trim());
 
-            using var reader = await command.ExecuteReaderAsync();
+            await using var reader = await command.ExecuteReaderAsync();
             if (!await reader.ReadAsync()) return null;
 
-            string storedHash = reader.GetString(2);
-            var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<string>();
-            var result = passwordHasher.VerifyHashedPassword(null!, storedHash, password);
+            string storedHash = reader.IsDBNull(2) ? "" : reader.GetString(2).Trim();
+            if (string.IsNullOrEmpty(storedHash)) return null;
+            var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
+            var result = passwordHasher.VerifyHashedPassword(storedHash, password);
 
-            if (result == Microsoft.AspNetCore.Identity.PasswordVerificationResult.Success) {
+            if (result == Microsoft.AspNet.Identity.PasswordVerificationResult.Success ||
+                result == Microsoft.AspNet.Identity.PasswordVerificationResult.SuccessRehashNeeded) {
                 return new User {
                     id = reader.GetInt32(0),
-                    login = reader.GetString(1),
-                    roly = reader.GetString(3),
-                    name = reader.GetString(4)
+                    login = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    roly = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    status = reader.IsDBNull(4) ? null : reader.GetString(4),
+                    name = reader.IsDBNull(5) ? null : reader.GetString(5),
+                    number_phone = reader.IsDBNull(6) ? null : reader.GetString(6),
+                    city = reader.IsDBNull(7) ? null : reader.GetString(7)
                 };
             }
+
             return null;
         }
     }
