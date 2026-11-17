@@ -139,14 +139,11 @@
     private string? error;
     private string? resultMessage;
 
-    private readonly string[] Types =
-        ["коммерческое помещение", "жилое помещение", "дом", "участок"];
+    private readonly string[] Types = ["коммерческое помещение", "жилое помещение", "дом", "участок"];
 
-    private readonly string[] Statuses =
-        ["активное", "не активное", "в заморозке"];
+    private readonly string[] Statuses = ["активное", "не активное", "в заморозке"];
 
-    private readonly string[] Repairs =
-        ["без ремонта", "косметический", "евроремонт", "дизайнерский"];
+    private readonly string[] Repairs = ["без ремонта", "косметический", "евроремонт", "дизайнерский"];
 
     protected override async Task OnParametersSetAsync() {
         isLoading = true;

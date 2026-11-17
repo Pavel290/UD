@@ -9,54 +9,57 @@
     <NavLink class="action-btn" href="/AddRecord">Добавить объект</NavLink>
 </div>
 
-@if (isLoading)
-{
+@if (isLoading) {
     <p class="muted">Загрузка…</p>
-}
-else if (error != null)
-{
+} else if (error != null) {
     <div class="alert error">Не удалось загрузить данные: @error</div>
-}
-else if (items.Count == 0)
-{
+} else if (items.Count == 0) {
     <div class="alert empty">
         Пока нет ни одного объекта.
         <NavLink href="AddRecord">Добавить первый</NavLink>
     </div>
-}
-else
-{
+} else {
     <p class="muted">Найдено: @items.Count</p>
 
+    @if (actionError != null) {
+        <div class="alert error">@actionError</div>
+    }
+
     <div class="cards">
-        @foreach (var item in items)
-        {
-        <article class="card" @key="item.id">
-            <header class="card-head">
-                <span class="badge">@item.type</span>
-                <span class="status @StatusClass(item.status)">@item.status</span>
-            </header>
+        @foreach (var item in items) {
+            <article class="card" @key="item.id">
+                <header class="card-head">
+                    <span class="badge">@item.type</span>
+                    <span class="status @StatusClass(item.status)">@item.status</span>
+                </header>
 
-            <div class="price">@item.price?.ToString("N0") ₽</div>
+                <div class="price">@item.price?.ToString("N0") ₽</div>
 
-            <dl class="props">
-                <div><dt>Площадь</dt><dd>@item.square?.ToString("0.#") м²</dd></div>
-                <div><dt>Комнат</dt><dd>@item.numberOfRooms</dd></div>
-                <div><dt>Этажей</dt><dd>@item.countFloor</dd></div>
-                <div><dt>Лифт</dt><dd>@(item.elevator == true ? "есть" : "нет")</dd></div>
-                <div><dt>Ремонт</dt><dd>@item.repair</dd></div>
-                <div><dt>Адрес</dt><dd>@item.adress</dd></div>
-            </dl>
+                <dl class="props">
+                    <div><dt>Площадь</dt><dd>@item.square?.ToString("0.#") м²</dd></div>
+                    <div><dt>Комнат</dt><dd>@item.numberOfRooms</dd></div>
+                    <div><dt>Этажей</dt><dd>@item.countFloor</dd></div>
+                    <div><dt>Лифт</dt><dd>@(item.elevator == true ? "есть" : "нет")</dd></div>
+                    <div><dt>Ремонт</dt><dd>@item.repair</dd></div>
+                    <div><dt>Адрес</dt><dd>@item.adress</dd></div>
+                </dl>
 
-            @if (!string.IsNullOrWhiteSpace(item.description))
-            {
-                <p class="desc">@item.description</p>
-            }
+                @if (!string.IsNullOrWhiteSpace(item.description)) {
+                    <p class="desc">@item.description</p>
+                }
 
-            <footer class="card-actions">
-                <NavLink class="btn-edit" href="@($"/EditHous/{item.id}")">Редактировать</NavLink>
-            </footer>
-        </article>
+                <footer class="card-actions">
+                    @if (confirmDeleteId == item.id) {
+                        <button class="btn-danger" @onclick="() => Delete(item.id)" disabled="@isDeleting">
+                            @(isDeleting ? "Удаление…" : "Точно удалить")
+                        </button>
+                        <button class="btn-cancel-small" @onclick="CancelDelete" disabled="@isDeleting">Отмена</button>
+                    } else {
+                        <NavLink class="btn-edit" href="@($"/EditHous/{item.id}")">Редактировать</NavLink>
+                        <button class="btn-delete" @onclick="() => AskDelete(item.id)">Удалить</button>
+                    }
+                </footer>
+            </article>
         }
     </div>
 }
@@ -66,26 +69,56 @@ else
     private bool isLoading = true;
     private string? error;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
+    private int? confirmDeleteId;
+    private bool isDeleting;
+    private string? actionError;
+
+    protected override async Task OnInitializedAsync() {
+        try {
             items = await Db.GetHousing();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             error = ex.Message;
         }
-        finally
-        {
+        finally {
             isLoading = false;
         }
     }
 
-    private static string StatusClass(string? status) => status switch
-    {
+    private static string StatusClass(string? status) => status switch {
         "активное" => "status-active",
         "в заморозке" => "status-frozen",
         _ => "status-off"
     };
+
+    private void AskDelete(int id) {
+        confirmDeleteId = id;
+        actionError = null;
+    }
+
+    private void CancelDelete() {
+        confirmDeleteId = null;
+        actionError = null;
+    }
+
+    private async Task Delete(int id) {
+        if (isDeleting) return;
+        isDeleting = true;
+
+        try {
+            var (ok, message) = await Db.DeleteHous(id);
+            if (ok) {
+                items.RemoveAll(i => i.id == id);
+                confirmDeleteId = null;
+            } else {
+                actionError = message;
+            }
+        }
+        catch (Exception ex) {
+            actionError = ex.Message;
+        }
+        finally {
+            isDeleting = false;
+        }
+    }
 }

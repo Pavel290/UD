@@ -21,6 +21,10 @@
 } else {
     <p class="muted">Найдено: @items.Count</p>
 
+    @if (actionError != null) {
+        <div class="alert error">@actionError</div>
+    }
+
     <div class="cards">
         @foreach (var item in items) {
             <article class="card" @key="item.id">
@@ -42,7 +46,15 @@
                 <a class="phone" href="@TelHref(item.number_phone)">@item.number_phone</a>
 
                 <footer class="card-actions">
-                    <NavLink class="btn-edit" href="@($"/EditUser/{item.id}")">Редактировать</NavLink>
+                    @if (confirmDeleteId == item.id) {
+                        <button class="btn-danger" @onclick="() => Delete(item.id)" disabled="@isDeleting">
+                            @(isDeleting ? "Удаление…" : "Точно удалить")
+                        </button>
+                        <button class="btn-cancel-small" @onclick="CancelDelete" disabled="@isDeleting">Отмена</button>
+                    } else {
+                        <NavLink class="btn-edit" href="@($"/EditUser/{item.id}")">Редактировать</NavLink>
+                        <button class="btn-delete" @onclick="() => AskDelete(item.id)">Удалить</button>
+                    }
                 </footer>
             </article>
         }
@@ -53,6 +65,10 @@
     List<User> items = [];
     private bool isLoading = true;
     private string? error;
+
+    private int? confirmDeleteId;
+    private bool isDeleting;
+    private string? actionError;
 
     protected override async Task OnInitializedAsync() {
         try {
@@ -96,4 +112,35 @@
         "Маркетолог" => "role-marketing",
         _ => "role-agent"
     };
+
+    private void AskDelete(int id) {
+        confirmDeleteId = id;
+        actionError = null;
+    }
+
+    private void CancelDelete() {
+        confirmDeleteId = null;
+        actionError = null;
+    }
+
+    private async Task Delete(int id) {
+        if (isDeleting) return;
+        isDeleting = true;
+
+        try {
+            var (ok, message) = await Db.DeleteUser(id);
+            if (ok) {
+                items.RemoveAll(i => i.id == id);
+                confirmDeleteId = null;
+            } else {
+                actionError = message;
+            }
+        }
+        catch (Exception ex) {
+            actionError = ex.Message;
+        }
+        finally {
+            isDeleting = false;
+        }
+    }
 }

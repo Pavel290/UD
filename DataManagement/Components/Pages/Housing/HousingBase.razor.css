@@ -172,6 +172,7 @@ h3 {
         border-color: #e2e7ec;
     }
 
+/* ---------- Кнопки в карточке ---------- */
 .card-actions {
     display: flex;
     gap: 0.5rem;

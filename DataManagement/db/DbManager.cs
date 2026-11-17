@@ -172,10 +172,7 @@ namespace DataManagement.db {
         }
 
         public async Task<Tuple<bool, string>> UpdateLead(LeadRecord record) {
-            const string query = @"
-        UPDATE leads SET
-            Name = @Name, Number_phone = @Number_phone,
-            Description = @Description, Status = @Status, city = @city
+            const string query = @"UPDATE leads SET Name = @Name, Number_phone = @Number_phone, Description = @Description, Status = @Status, city = @city
         WHERE id = @id";
 
             using var connection = new MySqlConnection(connectionString);
@@ -251,10 +248,7 @@ namespace DataManagement.db {
             };
         }
         public async Task<Tuple<bool, string>> UpdateUser(User record) {
-            const string query = @"
-        UPDATE users SET
-            Role = @Role, Status = @Status, name = @name,
-            number_phone = @number_phone, city = @city
+            const string query = @"UPDATE users SET Role = @Role, Status = @Status, name = @name, number_phone = @number_phone, city = @city
         WHERE id = @id";
 
             using var connection = new MySqlConnection(connectionString);
@@ -310,13 +304,9 @@ namespace DataManagement.db {
         }
 
         public async Task<Tuple<bool, string>> UpdateHous(RowRecord record) {
-            const string query = @"
-        UPDATE housing SET
-            Type = @Type, Square = @Square, Price = @Price, Status = @Status,
-            number_of_rooms = @number_of_rooms, count_floor = @count_floor,
-            elevator = @elevator, repair = @repair,
-            description = @description, adress = @adress
-        WHERE id = @id";
+            const string query = @"UPDATE housing SET Type = @Type, Square = @Square, Price = @Price, Status = @Status,
+            number_of_rooms = @number_of_rooms, count_floor = @count_floor, elevator = @elevator, repair = @repair,
+            description = @description, adress = @adress WHERE id = @id";
 
             using var connection = new MySqlConnection(connectionString);
             try {
@@ -338,6 +328,71 @@ namespace DataManagement.db {
                 int rows = await command.ExecuteNonQueryAsync();
                 return rows > 0
                     ? Tuple.Create(true, $"Обновлено записей {rows}")
+                    : Tuple.Create(false, "Запись не найдена");
+            }
+            catch (MySqlException ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+            catch (Exception ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+        }
+        public async Task<Tuple<bool, string>> DeleteHous(int id) {
+            const string query = "DELETE FROM housing WHERE id = @id";
+
+            using var connection = new MySqlConnection(connectionString);
+            try {
+                await connection.OpenAsync();
+                using var command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@id", id);
+
+                int rows = await command.ExecuteNonQueryAsync();
+                return rows > 0
+                    ? Tuple.Create(true, $"Удалено записей {rows}")
+                    : Tuple.Create(false, "Запись не найдена");
+            }
+            catch (MySqlException ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+            catch (Exception ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+        }
+
+        public async Task<Tuple<bool, string>> DeleteLead(int id) {
+            const string query = "DELETE FROM leads WHERE id = @id";
+
+            using var connection = new MySqlConnection(connectionString);
+            try {
+                await connection.OpenAsync();
+                using var command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@id", id);
+
+                int rows = await command.ExecuteNonQueryAsync();
+                return rows > 0
+                    ? Tuple.Create(true, $"Удалено записей {rows}")
+                    : Tuple.Create(false, "Запись не найдена");
+            }
+            catch (MySqlException ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+            catch (Exception ex) {
+                return Tuple.Create(false, ex.Message);
+            }
+        }
+
+        public async Task<Tuple<bool, string>> DeleteUser(int id) {
+            const string query = "DELETE FROM users WHERE id = @id";
+
+            using var connection = new MySqlConnection(connectionString);
+            try {
+                await connection.OpenAsync();
+                using var command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@id", id);
+
+                int rows = await command.ExecuteNonQueryAsync();
+                return rows > 0
+                    ? Tuple.Create(true, $"Удалено записей {rows}")
                     : Tuple.Create(false, "Запись не найдена");
             }
             catch (MySqlException ex) {
