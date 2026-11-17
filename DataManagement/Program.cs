@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddScoped<DbManager>();
+builder.Services.AddScoped<UserSession>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

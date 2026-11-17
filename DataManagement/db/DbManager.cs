@@ -402,6 +402,31 @@ namespace DataManagement.db {
                 return Tuple.Create(false, ex.Message);
             }
         }
+        public async Task<User?> Login(string login, string password) {
+            const string query = "SELECT id, Login, Hash, Role, name FROM users WHERE Login = @login LIMIT 1";
 
+            using var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@login", login);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (!await reader.ReadAsync()) return null;
+
+            string storedHash = reader.GetString(2);
+            var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<string>();
+            var result = passwordHasher.VerifyHashedPassword(null!, storedHash, password);
+
+            if (result == Microsoft.AspNetCore.Identity.PasswordVerificationResult.Success) {
+                return new User {
+                    id = reader.GetInt32(0),
+                    login = reader.GetString(1),
+                    roly = reader.GetString(3),
+                    name = reader.GetString(4)
+                };
+            }
+            return null;
+        }
     }
 }

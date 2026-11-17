@@ -1,0 +1,36 @@
+﻿@page "/login"
+@using DataManagement.db
+@inject DbManager Db
+@inject UserSession Session
+@inject NavigationManager Nav
+
+<h3>Вход в систему</h3>
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <InputText @bind-Value="loginModel.Login" placeholder="Логин" />
+    <InputText @bind-Value="loginModel.Password" type="password" placeholder="Пароль" />
+    <button type="submit">Войти</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(error)) {
+    <p style="color:red">@error</p>
+}
+
+@code {
+    private LoginModel loginModel = new();
+    private string? error;
+
+    private async Task HandleLogin() {
+        var user = await Db.Login(loginModel.Login, loginModel.Password);
+        if (user != null) {
+            Session.UserId = user.id;
+            Session.Login = user.login!;
+            Session.Role = user.roly!;
+            Nav.NavigateTo("/");
+        } else {
+            error = "Неверный логин или пароль";
+        }
+    }
+
+    private class LoginModel { public string Login { get; set; } = ""; public string Password { get; set; } = ""; }
+}

@@ -3,6 +3,13 @@
 @using DataManagement.db
 @inject DbManager Db
 @inject NavigationManager Nav
+@inject UserSession Session
+@inject NavigationManager Nav
+@code {
+    protected override void OnInitialized() {
+        if (!Session.IsAuthenticated) Nav.NavigateTo("/login");
+    }
+}
 
 <div class="form-card">
     <h3>Редактирование объекта недвижимости</h3>
